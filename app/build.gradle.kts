@@ -80,7 +80,7 @@ dependencies {
 
     // ML Kit - Local ML
     implementation("com.google.mlkit:text-recognition:16.0.0")
-    implementation("org.tensorflow:tensorflow-lite:2.17.0")
+implementation("com.google.ai.edge.litert:litert:2.1.0") 
 
     // Testing
     testImplementation("junit:junit:4.13.2")
