@@ -14,27 +14,33 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: gradle
+
+    - name: Download Gradle Wrapper JAR
+      run: |
+        cd gradle/wrapper
+        wget https://services.gradle.org/distributions/gradle-8.2-bin.zip
+        unzip gradle-8.2-bin.zip
+        cp gradle-8.2/lib/gradle-wrapper.jar .
+        rm -rf gradle.zip gradle-8.2/
 
     - name: Make gradlew executable
       run: chmod +x gradlew
 
     - name: Build Android App
-      run: ./gradlew assembleDebug --stacktrace
+      run: ./gradlew assembleDebug
 
     - name: Upload APK to artifacts
       uses: actions/upload-artifact@v4
       with:
         name: cryptopro-apk
         path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30        path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30
 
     - name: Display build status
