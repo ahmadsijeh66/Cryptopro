@@ -27,7 +27,7 @@ jobs:
         wget https://services.gradle.org/distributions/gradle-8.2-bin.zip
         unzip gradle-8.2-bin.zip
         cp gradle-8.2/lib/gradle-wrapper.jar .
-        rm -rf gradle.zip gradle-8.2/
+        rm -rf gradle-8.2-bin.zip gradle-8.2/
 
     - name: Make gradlew executable
       run: chmod +x gradlew
@@ -40,8 +40,4 @@ jobs:
       with:
         name: cryptopro-apk
         path: app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 30        path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30
-
-    - name: Display build status
-      run: echo "✅ Android APK build completed successfully!"
