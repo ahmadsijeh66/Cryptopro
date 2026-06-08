@@ -36,112 +36,40 @@
 ##############################################################################
 
 PROG="$0"
-# Determine the directory in which a script resides
-PROG_DIR=""
-case "$PROG" in
-  */*/*/gradlew )
-    # Parse PROG to determine directory
-    PROG_DIR=`echo "$PROG" | sed 's|\(.*\)/[^/]*$|\1|'`
-    ;;
-  */*gradlew )
-    PROG_DIR=`echo "$PROG" | sed 's|\(.*\)/[^/]*$|\1|'`
-    ;;
-  gradlew )
-    PROG_DIR="."
-    ;;
-esac
-
-# A function to find the awk executable, since the one in /bin/gawk is often not the same awk that is in PATH
-FIND_AWK() {
-    if command -v gawk &> /dev/null; then
-        echo "gawk"
-    elif command -v awk &> /dev/null; then
-        echo "awk"
+while [ -h "$PROG" ] ; do
+    ls=`ls -ld "$PROG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+        PROG="$link"
     else
-        echo ""
+        PROG=`dirname "$PROG"`/"$link"
     fi
-}
+done
 
-# Try to determine APP_HOME
-try_symlink() {
-    if [ -h "$1" ] 2>/dev/null; then
-        ls -ld "$1" 2>/dev/null | sed 's/ -> .*//' | sed 's/^.* //'
-    fi
-}
+SAVED="`pwd`"
+cd "`dirname \"$PROG\"`" >/dev/null
+APP_HOME="`pwd -P`"
+cd "$SAVED" >/dev/null
 
-APP_HOME=`cd "$(dirname "$0")" && pwd`
+APP_NAME="Gradle"
+APP_BASE_NAME=`basename "$0"`
 
-# A temporary variable for the script dir
-SCRIPT_DIR="$( cd "${PROG_DIR}" && pwd )"
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+DEFAULT_JVM_OPTS='\"$@\"'
 
-# Escape application home
-quoted_app_home=$(printf '%s\n' "$APP_HOME" | sed 's| |\\|g')
-
-# Use double quotes to make variables substitution resilient to any kind of quoting mechanism used by the shell.
-quoted_java_home=$(printf '%s\n' "$JAVA_HOME" | sed 's| |\\|g')
-
-# Determine the Java command to use to start the JVM.
-if [ -n "$JAVA_HOME" ] ; then
-    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
-        # IBM's JDK on AIX uses strange locations for the executables
-        JAVACMD="$JAVA_HOME/jre/sh/java"
-    else
-        JAVACMD="$JAVA_HOME/bin/java"
-    fi
-    if [ ! -x "$JAVACMD" ] ; then
-        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
-
-Please set the JAVA_HOME variable in your environment to match the
-location of your Java installation."
-    fi
-else
-    JAVACMD="java"
-    which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
-
-Please set the JAVA_HOME variable in your environment to match the
-location of your Java installation."
+# Use the maximum available, or set MAX_FD != maximum if you use "ulimit -n" to set the open file descriptor limit.
+if [ "$MAX_FD" = "maximum" ] || [ "$MAX_FD" = "max" ] ; then
+    MAX_FD="`ulimit -H -n`"
 fi
-
-# Increase the maximum file descriptors if we can.
-if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
-    case $( ulimit -S -n ) in #(
-      open)                           # Not possible
-        ;; #(
-      [\\\!]*[0-9]*) #(
-        if [ -w /proc/sys/fs/file-max ]; then
-          . /proc/sys/fs/file-max
-          MAX_FD=$((MAX_FD < 999999 ? 999999 : MAX_FD))
-          echo "Setting MAX_FD to $MAX_FD"
-          ulimit -n $MAX_FD
-        fi
-        ;; #(
-      *)
-        MAX_FD=$((\$MAX_FD < 999999 ? 999999 : \$MAX_FD))
-        ulimit -n $MAX_FD
-        ;;
-    esac
+if [ -z "$MAX_FD" ] || [ "$MAX_FD" = "unlimited" ] ; then
+    MAX_FD="262144"
 fi
+ulimit -n $MAX_FD
 
-# Collect all arguments for the java command, stacking in reverse order:
-#   * args from the command line
-#   * the main class name
-#   * -classpath
-#   * -D...appname settings
-#   * --module-path (only if needed)
-#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
+QUOTE_ARGS=""
+for arg in "$@" ; do
+    QUOTE_ARG="`printf '%s\n' "$arg" | sed \"s/[']/'\\\\''/g\"`"
+    QUOTE_ARGS="$QUOTE_ARGS '$QUOTE_ARG'"
+done
 
-set -- \
-        -Dorg.gradle.appname=$APP_BASE_NAME \
-        -classpath "$CLASSPATH" \
-        org.gradle.wrapper.GradleWrapperMain \
-        "$@"
-
-# Stop when "xargs" has processed all arguments
-eval "set -- $(printf '%s\\n' "${DEFAULT_JVM_OPTS} ${JAVA_OPTS} ${GRADLE_OPTS}" | xargs -n1 printf ' \"%%s\"\n' | tr '\n' ' ')" "$@"
-
-# by default we should be in the correct project dir, but when run from Finder on Mac, the cwd is wrong
-if [ "$(uname)" = "Darwin" ] && [ "$HOME" = "$PWD" ]; then
-  cd "$(dirname "$0")"
-fi
-
-exec "$JAVACMD" "$@"
+eval "exec \"$JAVACMD\" $DEFAULT_JVM_OPTS -classpath \"$CLASSPATH\" org.gradle.wrapper.GradleWrapperMain $QUOTE_ARGS"
