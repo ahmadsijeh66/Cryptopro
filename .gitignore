@@ -1,0 +1,36 @@
+# Gradle
+.gradle/
+build/
+.gradle
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+local.properties
+
+# Build artifacts
+*.apk
+*.aar
+*.ap_
+*.dex
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Kotlin
+*.kt.bak
+out/
+
+# Virtual machine
+.vscode/
+
+# Environment
+.env
+.env.local
