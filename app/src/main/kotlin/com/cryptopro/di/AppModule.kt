@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.cryptopro.data.local.database.CryptoproDatabase
 import com.cryptopro.data.remote.api.BinanceApi
 import com.cryptopro.domain.ml.LocalMLModel
+import com.cryptopro.domain.ml.PythonStrategyAnalyzer
 import com.cryptopro.domain.ml.StrategyAnalyzer
 import com.cryptopro.domain.repository.BacktestRepository
 import com.cryptopro.domain.repository.CryptoRepository
@@ -45,6 +46,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideStrategyAnalyzer(): StrategyAnalyzer {
-        return LocalMLModel()
+        // Using Python-based technical analysis strategy
+        return PythonStrategyAnalyzer()
     }
 }
