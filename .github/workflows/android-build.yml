@@ -21,20 +21,21 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Download Gradle Wrapper JAR
+    - name: Download Gradle distribution
       run: |
-        cd gradle/wrapper
-        wget https://services.gradle.org/distributions/gradle-8.2-bin.zip
-        unzip -q gradle-8.2-bin.zip
-        find gradle-8.2 -name "gradle-wrapper.jar" -exec cp {} . \;
-        rm -rf gradle-8.2-bin.zip gradle-8.2/
+        wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip -O gradle.zip
+        unzip -q gradle.zip
+        chmod +x gradle-8.2/bin/gradle
 
-    - name: Make gradlew executable
-      run: chmod +x gradlew
+    - name: Build with downloaded Gradle
+      run: ./gradle-8.2/bin/gradle --no-daemon assembleDebug --stacktrace
 
-    - name: Build Android App
-      run: ./gradlew assembleDebug
-
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: cryptopro-apk
+        path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
     - name: Upload APK to artifacts
       uses: actions/upload-artifact@v4
       with:
